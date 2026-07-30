@@ -214,10 +214,7 @@ export async function kickPlayer(code: string, uid: string): Promise<void> {
 }
 
 export async function leaveRoom(code: string, uid: string): Promise<void> {
-  // Keep the player's name and score in the room so they remain in the
-  // final ranking. Game progression ignores disconnected players; an
-  // explicit host kick still removes the record via kickPlayer().
-  await update(ref(`rooms/${code}/players/${uid}`), { connected: false });
+  await remove(ref(`rooms/${code}/players/${uid}`));
 }
 
 export function subscribeRound(code: string, callback: (round: Round | null) => void): () => void {
@@ -455,8 +452,6 @@ export async function prepareQuestion(
     "round/winnerReactionMs": null,
     "round/buzzAttempts": null,
     "round/selectedChoice": null,
-    "round/selectedChoices": null,
-    "round/correctChoiceIndices": multiSelect ? multiSelect.correctIndices : null,
     "round/spelling": spelling
       ? { position: 0, totalLength: spelling.totalLength, confirmedChars: [] }
       : null,
@@ -615,7 +610,6 @@ export async function assignNextTurn(
     turnNumber,
     winnerReactionMs: null,
     selectedChoice: null,
-    selectedChoices: null,
   });
 }
 
