@@ -1,0 +1,50 @@
+{
+  "rules": {
+    "rooms": {
+      "$roomId": {
+        ".read": "auth != null",
+        ".write": "auth != null && (!data.exists() || data.child('hostId').val() == auth.uid)",
+
+        "players": {
+          "$uid": {
+            ".write": "auth != null && $uid == auth.uid && (!data.exists() || !newData.exists())",
+            "name": {
+              ".write": "auth != null && ($uid == auth.uid || root.child('rooms').child($roomId).child('hostId').val() == auth.uid)"
+            },
+            "connected": {
+              ".write": "auth != null && $uid == auth.uid"
+            }
+          }
+        },
+
+        "round": {
+          "phase": {
+            ".write": "auth != null && root.child('rooms').child($roomId).child('hostId').val() == auth.uid"
+          },
+          "openedAt": {
+            ".write": "auth != null && root.child('rooms').child($roomId).child('hostId').val() == auth.uid"
+          },
+          "winnerId": {
+            ".write": "auth != null && ((root.child('rooms').child($roomId).child('round').child('phase').val() == 'open' && data.val() == null && newData.val() == auth.uid && root.child('rooms').child($roomId).child('players').child(auth.uid).child('canAnswer').val() == true && root.child('rooms').child($roomId).child('players').child(auth.uid).child('banned').val() != true) || (newData.val() == null && root.child('rooms').child($roomId).child('hostId').val() == auth.uid))"
+          },
+          "winnerReactionMs": {
+            ".write": "auth != null && ((data.val() == null && root.child('rooms').child($roomId).child('round').child('winnerId').val() == auth.uid) || (newData.val() == null && root.child('rooms').child($roomId).child('hostId').val() == auth.uid))"
+          },
+          "selectedChoice": {
+            ".write": "auth != null && ((data.val() == null && root.child('rooms').child($roomId).child('round').child('winnerId').val() == auth.uid) || (newData.val() == null && root.child('rooms').child($roomId).child('hostId').val() == auth.uid))"
+          },
+          "submissions": {
+            "$uid": {
+              ".write": "auth != null && $uid == auth.uid && !data.exists() && root.child('rooms').child($roomId).child('players').child($uid).child('banned').val() != true"
+            }
+          },
+          "buzzAttempts": {
+            "$uid": {
+              ".write": "auth != null && $uid == auth.uid && !data.exists() && root.child('rooms').child($roomId).child('players').child($uid).child('banned').val() != true"
+            }
+          }
+        }
+      }
+    }
+  }
+}
